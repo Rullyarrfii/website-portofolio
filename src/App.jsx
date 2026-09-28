@@ -183,7 +183,7 @@ export default function App() {
     const formData = new FormData(formElement);
 
     // Mengambil Access Key dari file .env
-    formData.append("access_key", import.meta.env.VITE_WEB3FORMS_ACCESS_KEY);
+    formData.append("access_key", import.meta.env.WEB3FORMS_ACCESS_KEY);
 
     try {
       const response = await fetch("https://api.web3forms.com/submit", {
