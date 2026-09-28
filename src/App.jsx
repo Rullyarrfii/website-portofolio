@@ -601,7 +601,7 @@ export default function App() {
       <footer className="border-t border-slate-800/80 py-8 text-center text-xs font-mono text-slate-500">
         <div className="flex justify-center space-x-4 mb-2">
           <a
-            href="https://github.com"
+            href="https://github.com/Rullyarrfii"
             target="_blank"
             rel="noreferrer"
             className="text-slate-400 hover:text-emerald-400 transition"
@@ -609,7 +609,7 @@ export default function App() {
             <GithubIcon className="w-5 h-5" />
           </a>
           <a
-            href="https://linkedin.com"
+            href="https://www.linkedin.com/in/rullyarrfii/"
             target="_blank"
             rel="noreferrer"
             className="text-slate-400 hover:text-emerald-400 transition"
@@ -618,8 +618,7 @@ export default function App() {
           </a>
         </div>
         <p>
-          © 2026 Backend Portfolio. Terminal Mode Built with React & Tailwind
-          CSS.
+          © 2026 Website Portfolio || Rullyarrfii.
         </p>
       </footer>
     </div>
