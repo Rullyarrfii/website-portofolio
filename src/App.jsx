@@ -45,6 +45,8 @@ export default function App() {
   // State untuk data dinamis dari Supabase
   const [projects, setProjects] = useState([]);
   const [skills, setSkills] = useState({});
+  const [documents, setDocuments] = useState({});
+  const [certificates, setCertificates] = useState({});
   const [loading, setLoading] = useState(true);
 
   // Ambil data dari Supabase saat halaman pertama kali dibuka
@@ -77,6 +79,25 @@ export default function App() {
           });
           setSkills(formattedSkills);
         }
+
+        // 3. Fetch data documents
+        const { data: documentsData, error: documentsError } = await supabase
+          .from("documents")
+          .select("*")
+          .order("id", { ascending: true });
+
+        if (documentsError) throw documentsError;
+        if (documentsData) setDocuments(documentsData);
+
+        // 4. Fetch data certification
+        const { data: certificatesData, error: certificatesError } =
+          await supabase
+            .from("certificates")
+            .select("*")
+            .order("id", { ascending: true });
+
+        if (certificatesError) throw certificatesError;
+        if (certificatesData) setCertificates(certificatesData);
       } catch (err) {
         console.error("Gagal mengambil data dari Supabase:", err.message);
       } finally {
@@ -86,44 +107,6 @@ export default function App() {
 
     loadPortfolioData();
   }, []);
-
-  // Data Sertifikat
-  const [certificates] = useState([
-    {
-      name: "Backend Engineering & Go Development",
-      issuer: "Technical Certification",
-      year: "2024",
-    },
-    {
-      name: "Database Design & SQL Optimization",
-      issuer: "Data Academy",
-      year: "2023",
-    },
-    {
-      name: "Python Web Scraping & Automation Pipeline",
-      issuer: "Software Engineering Cert",
-      year: "2023",
-    },
-  ]);
-
-  // Data Dokumen Download
-  const [documents] = useState([
-    {
-      title: "Curriculum Vitae (CV)",
-      desc: "Dokumen riwayat pengalaman backend, keahlian teknis, dan kontak terbaru.",
-      file: "Resume_Backend_Developer.pdf",
-    },
-    {
-      title: "Technical Portfolio Summary",
-      desc: "Ringkasan dokumentasi arsitektur proyek HRIS dan Web Scraper.",
-      file: "Technical_Portfolio.pdf",
-    },
-    {
-      title: "Surat Pengalaman Kerja / Paklaring",
-      desc: "Dokumen pendukung pengalaman kerja profesional dan verifikasi.",
-      file: "Experience_Letter.pdf",
-    },
-  ]);
 
   // Terminal state
   const [terminalInput, setTerminalInput] = useState("");
@@ -151,16 +134,15 @@ export default function App() {
             "Software Developer / Backend Engineer focused on Go, Python, PostgreSQL, and Web Automation.";
           break;
         case "skills":
-          response =
-            "Go, Python, PostgreSQL, Redis, REST APIs, Web Crawling, Docker.";
+          response = "Go, Python, PostgreSQL, REST APIs, Web Crawling, Docker.";
           break;
         case "projects":
           response =
-            "1. Enterprise HRIS System  2. Fault-Tolerant Web Crawler  3. High Performance API Gateway.";
+            "1. Enterprise HRIS System  2. Crawler Engine  3. Aplikasi Manajemen Stok.";
           break;
         case "contact":
           response =
-            "Email: rullyarrfii.dev@gmail.com | Available for Full-Time & Freelance opportunities.";
+            "Email: rully.jr45@gmail.com | Phone: +62 89631756674 | Available for Full-Time & Freelance opportunities.";
           break;
         case "clear":
           setTerminalHistory([]);
@@ -184,9 +166,45 @@ export default function App() {
   }, [terminalHistory]);
 
   const copyEmail = () => {
-    navigator.clipboard.writeText("rullyarrfii.dev@gmail.com");
+    navigator.clipboard.writeText("rully.jr45@gmail.com");
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2000);
+  };
+
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [sendResultStatus, setSendResultStatus] = useState(null); // 'success' | 'error' | null
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    setSendingMessage(true);
+    setSendResultStatus(null);
+
+    const formElement = e.target;
+    const formData = new FormData(formElement);
+
+    // Mengambil Access Key dari file .env
+    formData.append("access_key", import.meta.env.VITE_WEB3FORMS_ACCESS_KEY);
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setSendResultStatus("success");
+        formElement.reset();
+      } else {
+        setSendResultStatus("error");
+      }
+    } catch (error) {
+      console.error("Gagal mengirim email:", error);
+      setSendResultStatus("error");
+    } finally {
+      setSendingMessage(false);
+    }
   };
 
   const handleDownload = (fileName) => {
@@ -202,7 +220,7 @@ export default function App() {
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-2 font-mono text-emerald-400 font-semibold text-base sm:text-lg">
             <Terminal className="w-5 h-5 text-emerald-400" />
-            <span>dev@backend:~$</span>
+            <span>Portofolio - Rully Ar Rafii:~$</span>
           </div>
 
           {/* Desktop Nav */}
@@ -277,14 +295,14 @@ export default function App() {
           <div className="lg:col-span-7 space-y-4">
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-950/70 border border-emerald-800/80 text-emerald-400 text-xs font-mono">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>Available for Backend Roles & Freelance Projects</span>
+              <span>Available for Freelance Projects</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-              Software Developer &{" "}
-              <span className="text-emerald-400 font-mono">
+              Software Developer {/*&{" "}*/}
+              {/* <span className="text-emerald-400 font-mono">
                 Backend Specialist
-              </span>
+              </span> */}
             </h1>
 
             <p className="text-slate-400 leading-relaxed text-sm sm:text-base">
@@ -306,7 +324,7 @@ export default function App() {
                 className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-medium rounded-lg font-mono text-xs sm:text-sm transition flex items-center space-x-2"
               >
                 <Download className="w-4 h-4" />
-                <span>Download CV & Portofolio</span>
+                <span>Documents</span>
               </button>
             </div>
           </div>
@@ -367,43 +385,45 @@ export default function App() {
                   key={idx}
                   className="bg-slate-900 border border-slate-800 rounded-xl p-6 hover:border-emerald-500/50 transition"
                 >
-                  <div className="text-xs font-mono text-emerald-400 mb-2 uppercase">
-                    {proj.category}
-                  </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-white mb-2">
-                    {proj.title}
-                  </h3>
-                  <p className="text-slate-400 text-sm mb-4 leading-relaxed">
-                    {proj.summary}
-                  </p>
-
-                  <div className="mb-4">
-                    <div className="text-xs font-mono text-slate-500 mb-1">
-                      Architecture Highlights:
+                  <a href={proj.url} target="_blank" rel="noopener noreferrer">
+                    <div className="text-xs font-mono text-emerald-400 mb-2 uppercase">
+                      {proj.category}
                     </div>
-                    <ul className="space-y-1.5">
-                      {proj.highlights.map((h, i) => (
-                        <li
-                          key={i}
-                          className="text-xs text-slate-300 flex items-start space-x-2"
-                        >
-                          <ChevronRight className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                          <span>{h}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                    <h3 className="text-lg sm:text-xl font-bold text-white mb-2">
+                      {proj.title}
+                    </h3>
+                    <p className="text-slate-400 text-sm mb-4 leading-relaxed">
+                      {proj.summary}
+                    </p>
 
-                  <div className="flex flex-wrap gap-2 pt-3 border-t border-slate-800">
-                    {proj.stack.map((st, i) => (
-                      <span
-                        key={i}
-                        className="px-2.5 py-1 bg-slate-950 border border-slate-800 text-slate-300 text-xs rounded font-mono"
-                      >
-                        {st}
-                      </span>
-                    ))}
-                  </div>
+                    <div className="mb-4">
+                      <div className="text-xs font-mono text-slate-500 mb-1">
+                        Architecture Highlights:
+                      </div>
+                      <ul className="space-y-1.5">
+                        {proj.highlights.map((h, i) => (
+                          <li
+                            key={i}
+                            className="text-xs text-slate-300 flex items-start space-x-2"
+                          >
+                            <ChevronRight className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                            <span>{h}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 pt-3 border-t border-slate-800">
+                      {proj.stack.map((st, i) => (
+                        <span
+                          key={i}
+                          className="px-2.5 py-1 bg-slate-950 border border-slate-800 text-slate-300 text-xs rounded font-mono"
+                        >
+                          {st}
+                        </span>
+                      ))}
+                    </div>
+                  </a>
                 </div>
               ))}
             </div>
@@ -470,6 +490,16 @@ export default function App() {
                     <span>Issued {cert.year}</span>
                     <span className="text-emerald-400">Verified</span>
                   </div>
+                  <a
+                    href={cert.file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                    className="w-full py-2 bg-slate-950 hover:bg-slate-800 border border-slate-700 text-emerald-400 rounded font-mono text-xs flex items-center justify-center space-x-2 transition"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Download PDF</span>
+                  </a>
                 </div>
               ))}
             </div>
@@ -482,7 +512,7 @@ export default function App() {
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h2 className="text-xl sm:text-2xl font-bold font-mono text-white flex items-center space-x-2">
                 <FileText className="w-5 h-5 text-emerald-400" />
-                <span>Documents & Downloads</span>
+                <span>Documents</span>
               </h2>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -497,16 +527,19 @@ export default function App() {
                       {doc.title}
                     </h3>
                     <p className="text-slate-400 text-xs leading-relaxed mb-4">
-                      {doc.desc}
+                      {doc.description}
                     </p>
                   </div>
-                  <button
-                    onClick={() => handleDownload(doc.file)}
+                  <a
+                    href={doc.file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
                     className="w-full py-2 bg-slate-950 hover:bg-slate-800 border border-slate-700 text-emerald-400 rounded font-mono text-xs flex items-center justify-center space-x-2 transition"
                   >
                     <Download className="w-4 h-4" />
                     <span>Download PDF</span>
-                  </button>
+                  </a>
                 </div>
               ))}
             </div>
@@ -529,7 +562,7 @@ export default function App() {
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-5">
               <div className="flex items-center justify-between p-3 bg-slate-950 border border-slate-800 rounded-lg">
                 <span className="font-mono text-xs text-slate-300">
-                  rullyarrfii.dev@gmail.com
+                  rully.jr45@gmail.com
                 </span>
                 <button
                   onClick={copyEmail}
@@ -544,53 +577,78 @@ export default function App() {
                 </button>
               </div>
 
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  alert("Pesan Anda terkirim!");
-                }}
-                className="space-y-4"
-              >
+              <form onSubmit={handleContactSubmit} className="space-y-4">
+                {/* Honeypot field untuk proteksi bot spam (tersembunyi) */}
+                <input
+                  type="checkbox"
+                  name="botcheck"
+                  className="hidden"
+                  style={{ display: "none" }}
+                />
+
                 <div>
                   <label className="block text-xs font-mono text-slate-400 mb-1">
                     Nama / Perusahaan
                   </label>
                   <input
                     type="text"
+                    name="name"
                     required
                     placeholder="Contoh: PT Teknologi Bangsa"
                     className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-400"
                   />
                 </div>
+
                 <div>
                   <label className="block text-xs font-mono text-slate-400 mb-1">
                     Email Anda
                   </label>
                   <input
                     type="email"
+                    name="email"
                     required
                     placeholder="email@perusahaan.com"
                     className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-400"
                   />
                 </div>
+
                 <div>
                   <label className="block text-xs font-mono text-slate-400 mb-1">
                     Pesan / Penawaran Kerjasama
                   </label>
                   <textarea
+                    name="message"
                     rows={4}
                     required
                     placeholder="Jelaskan kebutuhan proyek atau tawaran kerja..."
                     className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-400"
                   ></textarea>
                 </div>
+
                 <button
                   type="submit"
-                  className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded font-mono text-sm transition flex items-center justify-center space-x-2"
+                  disabled={sendingMessage}
+                  className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 disabled:bg-slate-800 text-slate-950 disabled:text-slate-500 font-bold rounded font-mono text-sm transition flex items-center justify-center space-x-2"
                 >
                   <Send className="w-4 h-4" />
-                  <span>Kirim Pesan</span>
+                  <span>
+                    {sendingMessage ? "Mengirim Pesan..." : "Kirim Pesan"}
+                  </span>
                 </button>
+
+                {/* Notifikasi feedback status pengiriman */}
+                {sendResultStatus === "success" && (
+                  <p className="text-emerald-400 text-xs font-mono text-center mt-2">
+                    ✓ Pesan berhasil terkirim langsung ke email saya. Terima
+                    kasih!
+                  </p>
+                )}
+                {sendResultStatus === "error" && (
+                  <p className="text-rose-400 text-xs font-mono text-center mt-2">
+                    ✕ Gagal mengirim pesan. Silakan coba lagi atau salin email
+                    langsung di atas.
+                  </p>
+                )}
               </form>
             </div>
           </section>
@@ -617,9 +675,7 @@ export default function App() {
             <LinkedinIcon className="w-5 h-5" />
           </a>
         </div>
-        <p>
-          © 2026 Website Portfolio || Rullyarrfii.
-        </p>
+        <p>© 2026 Website Portfolio || Rullyarrfii.</p>
       </footer>
     </div>
   );
